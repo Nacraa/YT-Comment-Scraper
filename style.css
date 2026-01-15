@@ -1,0 +1,29 @@
+.header {
+    background-color: #3d5874;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.header h1 {
+    color: white;
+    text-align: center;
+    margin: 0;
+}
+
+.step{
+    opacity: 0.5;
+    font-size: 12px;
+}
+
+.st-key-black button{
+    background-color: #3d5874;
+    color: white;
+}
+
+.st-key-black button:hover{
+    background-color: #9eb3de;
+}
+
+.stDataFrame table {
+    border: 3px solid black;
+}
