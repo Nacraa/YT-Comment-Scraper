@@ -1,3 +1,4 @@
 streamlit
 pandas
+langdetect
 google-api-python-client
