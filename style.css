@@ -16,6 +16,11 @@ header[data-testid="stHeader"] svg {
     color: white;
 }
 
+/* Sidebar */
+[data-testid="stSidebar"] {
+    display: none;
+}
+
 /* Header */
 .header {
     background-color: #3d5874;
@@ -44,12 +49,12 @@ header[data-testid="stHeader"] svg {
 }
 
 /* Button */
-.st-key-submit button, .st-key-submit2 button{
+.st-key-submit button, .st-key-submit2 button, .st-key-list button, .st-key-back button{
     background-color: rgba(17, 100, 224, 0.753);
     color: white;
 }
 
-.st-key-submit button:hover, .st-key-submit2 button:hover{
+.st-key-submit button:hover, .st-key-submit2 button:hover, .st-key-list button:hover, .st-key-back button:hover{
     background-color: #9eb3de;
     animation: pulse 0.8s infinite;
 }
