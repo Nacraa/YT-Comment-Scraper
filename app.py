@@ -23,21 +23,6 @@ st.write(" ")
 # Input Video ID
 Video_ID = st.text_input("Masukkan Video ID:")
 
-#Langkah memasukkan Video ID
-step1, step2, step3 = st.columns([1,1,1], gap="large")
-
-with step1:
-    st.markdown('<div class="step">1. Ambil ID dari URL video Youtube</div>', unsafe_allow_html=True)
-    st.image("1.png")
-
-with step2:
-    st.markdown('<div class="step">2. Letakkan ID kedalam text field</div>', unsafe_allow_html=True)
-    st.image("2.png")
-
-with step3:
-    st.markdown('<div class="step">3. Klik tombol "Tampilkan Komentar"</div>', unsafe_allow_html=True)
-    st.image("3.png")
-
 # Popup filter kata
 @st.dialog("Filter Kata (Opsional)")
 def filter_dialog():
@@ -58,12 +43,30 @@ with col2:
         filter_dialog()
     st.markdown("<br>",unsafe_allow_html=True)
 
+#Langkah memasukkan Video ID
+step1, step2, step3 = st.columns([1,1,1], gap="large")
+
+with step1:
+    st.markdown('<div class="step">1. Ambil ID dari URL video Youtube</div>', unsafe_allow_html=True)
+    st.image("1.png")
+
+with step2:
+    st.markdown('<div class="step">2. Letakkan ID kedalam text field</div>', unsafe_allow_html=True)
+    st.image("2.png")
+
+with step3:
+    st.markdown('<div class="step">3. Klik tombol "Tampilkan Komentar"</div>', unsafe_allow_html=True)
+    st.image("3.png")
+
 # Dialog Filter Kata
 if "filterchoose" not in st.session_state:
     st.session_state.filterchoose = []
 
 if "pressed" not in st.session_state:
     st.session_state.pressed = False
+
+if "APIerror" not in st.session_state:
+    st.session_state.APIerror = True
 
 # Fungsi menghitung 10 kata terbanyak
 def top_10_words(komentar_list):
@@ -189,6 +192,7 @@ def process():
                             latitude="Latitude",
                             longitude="Longitude"
                         )
+                        st.session_state.APIerror = False
                     else:
                         st.warning("Tidak dapat mendeteksi bahasa komentar untuk GIS.")
                 else:
@@ -196,12 +200,11 @@ def process():
 
             except HttpError:
                 st.error(f"Terjadi error API. Tolong masukka Video ID valid!")
-                st.session_state.error = True
+                st.session_state.APIerror = True
 
 # Halaman list semua komentar
 if st.session_state.pressed:
     process()
-    if Video_ID.strip() != "" and st.session_state.error != True:
+    if Video_ID.strip() != "" and st.session_state.APIerror == False:
         if st.button("List semua komentar", key="list"):
-            st.session_state.pressed = False
             st.switch_page("pages/allcomments.py")
