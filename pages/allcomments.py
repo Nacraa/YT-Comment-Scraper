@@ -13,4 +13,6 @@ else:
     st.warning("Data komentar belum tersedia. Silakan klik 'Tampilkan Komentar' terlebih dahulu.")
 
 if st.button("Kembali ke halaman utama", key="back"):
+    st.session_state.APIerror = True
+    st.session_state.pressed = False
     st.switch_page("app.py")
