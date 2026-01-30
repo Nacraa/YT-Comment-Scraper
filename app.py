@@ -23,23 +23,6 @@ st.write(" ")
 # Input Video ID
 Video_ID = st.text_input("Masukkan Video ID:")
 
-@st.dialog("Filter Kata (Opsional)")
-def filter_dialog():
-    st.markdown('<div style="font-style: italic; font-size: 13px; opacity: 0.7; text-align: center;">Masukkan kata ke dalam text field untuk tidak menghitungnya di list 10 kata terbanyak.</div>' ,unsafe_allow_html=True)
-    st.session_state.filterchoose = st.text_input(" ", placeholder="Contoh: jelek keren sulit").lower().split()
-
-    if st.button("Lanjutkan", key="submit2"):
-        st.session_state.pressed = True
-        st.rerun()
-
-col1, col2, col3 = st.columns([1,1,1]) # Menengahkan tombol 'Tampilkan Komentar'
-with col2:
-    if st.button("Tampilkan Komentar", key="submit"):
-        if "pressed" not in st.session_state:
-            st.session_state.pressed = False
-        filter_dialog()
-    st.markdown("<br>",unsafe_allow_html=True)
-
 #Langkah memasukkan Video ID
 step1, step2, step3 = st.columns([1,1,1], gap="large")
 
@@ -54,6 +37,26 @@ with step2:
 with step3:
     st.markdown('<div class="step">3. Klik tombol "Tampilkan Komentar"</div>', unsafe_allow_html=True)
     st.image("3.png")
+
+# Popup filter kata
+@st.dialog("Filter Kata (Opsional)")
+def filter_dialog():
+    st.markdown('<div style="font-style: italic; font-size: 13px; opacity: 0.7; text-align: center;">Masukkan kata ke dalam text field untuk tidak menghitungnya di list 10 kata terbanyak.</div>' ,unsafe_allow_html=True)
+    st.session_state.filterchoose = st.text_input(" ", placeholder="Contoh: jelek keren sulit").lower().split()
+
+    if st.button("Lanjutkan", key="submit2"):
+        st.session_state.pressed = True
+        st.rerun()
+
+# Menengahkan tombol Tampilkan komentar
+col1, col2, col3 = st.columns([1,1,1])
+with col2:
+    # Tombol Tampilkan komentar
+    if st.button("Tampilkan Komentar", key="submit"):
+        if "pressed" not in st.session_state:
+            st.session_state.pressed = False
+        filter_dialog()
+    st.markdown("<br>",unsafe_allow_html=True)
 
 # Dialog Filter Kata
 if "filterchoose" not in st.session_state:
@@ -111,90 +114,94 @@ def detect_language_gis(komentar_list):
     return pd.DataFrame(locations)
 
 # Menampilkan Hasil
-if st.session_state.pressed:
-    comments = []
+def process():
+        comments = []
 
-    if Video_ID.strip() == "":
-        st.error("Video ID tidak boleh kosong!")
+        if Video_ID.strip() == "":
+            st.error("Video ID tidak boleh kosong!")
 
-    else:
-        try:
-            # Request awal
-            request = youtube.commentThreads().list(
-                part="snippet",
-                videoId=Video_ID.strip(),
-                maxResults=100,
-                textFormat="plainText"
-            )
+        else:
+            try:
+                # Request awal
+                request = youtube.commentThreads().list(
+                    part="snippet",
+                    videoId=Video_ID.strip(),
+                    maxResults=100,
+                    textFormat="plainText"
+                )
 
-            # Loop pagination
-            while request:
-                response = request.execute()
+                # Loop pagination
+                while request:
+                    response = request.execute()
 
-                for komentar in response["items"]:
-                    snippet = komentar["snippet"]["topLevelComment"]["snippet"]
-                    comments.append({
-                        "Username": snippet["authorDisplayName"],
-                        "Tanggal": snippet["publishedAt"],
-                        "Komentar": snippet["textDisplay"]
-                    })
+                    for komentar in response["items"]:
+                        snippet = komentar["snippet"]["topLevelComment"]["snippet"]
+                        comments.append({
+                            "Username": snippet["authorDisplayName"],
+                            "Tanggal": snippet["publishedAt"],
+                            "Komentar": snippet["textDisplay"]
+                        })
 
-                request = youtube.commentThreads().list_next(request, response)
+                    request = youtube.commentThreads().list_next(request, response)
 
-            # Tampilkan hasil komentar
-            if comments:
-                df = pd.DataFrame(comments)
-                komentar_list = df["Komentar"].tolist()
-                top_words = top_10_words(komentar_list)
+                # Tampilkan hasil komentar
+                if comments:
+                    df = pd.DataFrame(comments)
+                    st.session_state.df = df
+                    komentar_list = df["Komentar"].tolist()
+                    top_words = top_10_words(komentar_list)
 
-                st.markdown("<hr>",unsafe_allow_html=True)
-                st.success(f"Berhasil mengambil {len(df)} komentar")
-                st.markdown(f'<div class = "thumbnail"><img src="https://img.youtube.com/vi/{Video_ID}/maxresdefault.jpg"></div>', unsafe_allow_html=True) # Memperlihatkan Thumbnail
+                    st.markdown("<hr>",unsafe_allow_html=True)
+                    st.success(f"Berhasil mengambil {len(df)} komentar")
+                    st.markdown(f'<div class = "thumbnail"><img src="https://img.youtube.com/vi/{Video_ID}/maxresdefault.jpg"></div>', unsafe_allow_html=True) # Memperlihatkan Thumbnail
 
-                # Table 10 Kata yang Sering Muncul
-                st.subheader("10 Kata yang Paling Sering Muncul")
-                top_df = pd.DataFrame(top_words, columns=["Kata", "Frekuensi"])
+                    # Table 10 Kata yang Sering Muncul
+                    st.subheader("10 Kata yang Paling Sering Muncul")
+                    top_df = pd.DataFrame(top_words, columns=["Kata", "Frekuensi"])
 
+                    col_table, col_chart = st.columns(2, gap="small")
 
-                col_table, col_chart = st.columns(2, gap="small")
+                    with col_table:
+                        st.table(top_df)
 
-                with col_table:
-                    st.table(top_df)
+                    with col_chart:
+                        st.bar_chart(
+                            data=top_df.set_index("Kata"),
+                            use_container_width=True
+                        )
 
-                with col_chart:
-                    st.bar_chart(
-                        data=top_df.set_index("Kata"),
-                        use_container_width=True
-                    )
+                    # GIS Berdasarkan Hasil Komentar
+                    st.markdown("<hr>",unsafe_allow_html=True)
+                    st.subheader("GIS Berdasarkan Bahasa Komentar")
 
-                # GIS Berdasarkan Hasil Komentar
-                st.markdown("<hr>",unsafe_allow_html=True)
-                st.subheader("GIS Berdasarkan Bahasa Komentar")
+                    gis_df = detect_language_gis(komentar_list)
 
-                gis_df = detect_language_gis(komentar_list)
+                    if not gis_df.empty:
+                        country_count = gis_df["Negara"].value_counts().reset_index()
+                        country_count.columns = ["Negara", "Jumlah Komentar"]
 
-                if not gis_df.empty:
-                    country_count = gis_df["Negara"].value_counts().reset_index()
-                    country_count.columns = ["Negara", "Jumlah Komentar"]
+                        st.markdown("**Distribusi Komentar Berdasarkan Estimasi Negara**")
+                        st.table(country_count)
 
-                    st.markdown("**Distribusi Komentar Berdasarkan Estimasi Negara**")
-                    st.table(country_count)
-
-                    st.markdown("**Peta Estimasi Lokasi Komentar**")
-                    st.map(
-                        gis_df,
-                        latitude="Latitude",
-                        longitude="Longitude"
-                    )
+                        st.markdown("**Peta Estimasi Lokasi Komentar**")
+                        st.map(
+                            gis_df,
+                            latitude="Latitude",
+                            longitude="Longitude"
+                        )
+                    else:
+                        st.warning("Tidak dapat mendeteksi bahasa komentar untuk GIS.")
                 else:
-                    st.warning("Tidak dapat mendeteksi bahasa komentar untuk GIS.")
+                    st.warning("Tidak ada komentar yang ditemukan.")
 
-                # List Semua Komentar
-                st.markdown("<hr>",unsafe_allow_html=True)
-                st.subheader("List Semua Komentar")
-                st.dataframe(df, use_container_width=True)
-            else:
-                st.warning("Tidak ada komentar yang ditemukan.")
+            except HttpError:
+                st.error(f"Terjadi error API. Tolong masukka Video ID valid!")
+                st.session_state.error = True
 
-        except HttpError as e:
-            st.error(f"Terjadi error API: {e}")
+# Halaman list semua komentar
+if st.session_state.pressed:
+    process()
+    if Video_ID.strip() != "" and st.session_state.error != True:
+        if st.button("List semua komentar", key="list"):
+            st.session_state.pressed = False
+            st.switch_page("pages/allcomments.py")
