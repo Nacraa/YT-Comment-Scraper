@@ -78,11 +78,11 @@ def top_10_words(komentar_list):
     stopwords = {
         # Bahasa Indonesia
         "dan", "yang", "di", "ke", "dari", "ini", "itu", "untuk", "dengan",
-        "pada", "adalah", "saya", "kamu", "dia", "kami", "kita", "nya",
+        "pada", "adalah", "nya",
 
         # Bahasa Inggris
         "the", "a", "an", "is", "are", "to", "of", "in", "this", "and", "that", 
-        "was", "but", "for", "just", "with", "when", "have", "the"
+        "was", "but", "for", "just", "with", "have", "the"
     }
 
     stopwords = stopwords.union(set(st.session_state.filterchoose))
@@ -177,7 +177,7 @@ def process():
 
                     # GIS Berdasarkan Hasil Komentar
                     st.markdown("<hr>",unsafe_allow_html=True)
-                    st.subheader("Geographic Information System Berdasarkan Bahasa Komentar")
+                    st.subheader("Distribusi Komentar Berdasarkan Estimasi Negara")
 
                     gis_df = detect_language_gis(komentar_list)
                     
@@ -187,9 +187,7 @@ def process():
                         country_count.columns = ["Negara", "Jumlah Komentar"]
                         country_count.index = np.arange(1, len(country_count) + 1) # Mengubah index tabel agar dimulai dari 1
 
-                        st.markdown("**Distribusi Komentar Berdasarkan Estimasi Negara**")
                         st.table(country_count)
-
                         st.markdown("**Peta Estimasi Lokasi Komentar**")
                         st.map(
                             gis_df,
@@ -213,4 +211,3 @@ if st.session_state.pressed:
     if Video_ID.strip() != "" and st.session_state.APIerror == False:
         if st.button("List semua komentar", key="list"):
             st.switch_page("pages/allcomments.py")
-
