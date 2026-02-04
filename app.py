@@ -17,7 +17,7 @@ def load_css(file_path):
 load_css("style.css")
 
 # Header
-st.markdown('<div class="header"><h1>YOUTUBE COMMENT SCRAPPER</h1>' 
+st.markdown('<div class="header"><h1>YOUTUBE COMMENT SCRAPER</h1>' 
             '<h6>Aplikasi untuk mengambil, menganalisis, dan memvisualisasikan komentar Youtube secara otomatis</h6></div>',unsafe_allow_html=True)
 st.write(" ")
 
@@ -211,4 +211,5 @@ if st.session_state.pressed:
     if Video_ID.strip() != "" and st.session_state.APIerror == False:
         if st.button("List semua komentar", key="list"):
             st.switch_page("pages/allcomments.py")
+
 
