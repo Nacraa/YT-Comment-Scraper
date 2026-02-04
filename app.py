@@ -4,6 +4,7 @@ from collections import Counter
 from langdetect import detect
 import streamlit as st
 import pandas as pd
+import numpy as np
 
 # API
 API_KEY = st.secrets["API_KEY"]
@@ -161,6 +162,7 @@ def process():
                     # Table 10 Kata yang Sering Muncul
                     st.subheader("10 Kata yang Paling Sering Muncul")
                     top_df = pd.DataFrame(top_words, columns=["Kata", "Frekuensi"])
+                    top_df.index = np.arange(1, len(top_df) + 1) # Mengubah index tabel agar dimulai dari 1
 
                     col_table, col_chart = st.columns(2, gap="small")
 
@@ -178,10 +180,12 @@ def process():
                     st.subheader("GIS Berdasarkan Bahasa Komentar")
 
                     gis_df = detect_language_gis(komentar_list)
+                    
 
                     if not gis_df.empty:
                         country_count = gis_df["Negara"].value_counts().reset_index()
                         country_count.columns = ["Negara", "Jumlah Komentar"]
+                        country_count.index = np.arange(1, len(country_count) + 1) # Mengubah index tabel agar dimulai dari 1
 
                         st.markdown("**Distribusi Komentar Berdasarkan Estimasi Negara**")
                         st.table(country_count)
@@ -192,6 +196,7 @@ def process():
                             latitude="Latitude",
                             longitude="Longitude"
                         )
+
                         st.session_state.APIerror = False
                     else:
                         st.warning("Tidak dapat mendeteksi bahasa komentar untuk GIS.")
