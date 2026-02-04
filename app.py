@@ -18,7 +18,7 @@ load_css("style.css")
 
 # Header
 st.markdown('<div class="header"><h1>YOUTUBE COMMENT SCRAPPER</h1>' 
-            '<h6>Progam untuk mengambil, menganalisis, dan memvisualisasikan komentar Youtube secara otomatis</h6></div>',unsafe_allow_html=True)
+            '<h6>Aplikasi untuk mengambil, menganalisis, dan memvisualisasikan komentar Youtube secara otomatis</h6></div>',unsafe_allow_html=True)
 st.write(" ")
 
 # Input Video ID
@@ -211,3 +211,4 @@ if st.session_state.pressed:
     if Video_ID.strip() != "" and st.session_state.APIerror == False:
         if st.button("List semua komentar", key="list"):
             st.switch_page("pages/allcomments.py")
+
