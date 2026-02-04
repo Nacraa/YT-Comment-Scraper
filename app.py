@@ -177,7 +177,7 @@ def process():
 
                     # GIS Berdasarkan Hasil Komentar
                     st.markdown("<hr>",unsafe_allow_html=True)
-                    st.subheader("GIS Berdasarkan Bahasa Komentar")
+                    st.subheader("Geographic Information System Berdasarkan Bahasa Komentar")
 
                     gis_df = detect_language_gis(komentar_list)
                     
@@ -213,3 +213,4 @@ if st.session_state.pressed:
     if Video_ID.strip() != "" and st.session_state.APIerror == False:
         if st.button("List semua komentar", key="list"):
             st.switch_page("pages/allcomments.py")
+
